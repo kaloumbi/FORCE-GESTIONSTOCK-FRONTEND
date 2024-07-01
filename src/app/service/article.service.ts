@@ -66,11 +66,18 @@ export class ArticleService {
   /* getUpdateArticle(id: number):Observable <ArticleI> {
     return id;
   } */
+  
+  getArticleByID(id: number): Observable<ArticleI> {
+    
+    return this.http.get<ArticleI>(`${this.urlArtAD}/article/${id}/detail`)
+  }
 
   //Modify Article
-  updateArticle(articleObj: ArticleI) {
-    return this.http.put<ArticleI>(`${this.urlArtAD}/updateArticle`, articleObj)
+  updateArticle(id: number, articleObj: ArticleI) {
+    return this.http.put<ArticleI>(`${this.urlArtAD}/updateArticle/${id}/updated`, articleObj)
   }
+
+  
 
 
 

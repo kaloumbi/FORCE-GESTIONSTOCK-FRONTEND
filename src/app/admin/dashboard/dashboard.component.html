@@ -159,7 +159,7 @@
                                                 <input formControlName="id_USER" type="text" class="form-control" id="utilisateurProduit" placeholder="Entrez l'utilisateur">
                                             </div>
 
-                                            <button type="submit" (click)="articlSubmit()" class="btn btn-primary">{{titleButton}} </button>
+                                            <button type="submit" (click)="titleButton === 'Modifier' ? editArticle() : articlSubmit()" class="btn btn-primary">{{titleButton}} </button>
                                         </form>
                                     </div>
                                 </div>
@@ -179,6 +179,7 @@
                                             <td>Etat</td>
                                             <td>Utilisateur</td>
                                             <td>Action</td>
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -191,12 +192,16 @@
                                             <td>{{artItem.id_USER}}</td>
 
                                             <td>
+                                                <button (click)="detailArticle(artItem.id_article)" type="button" class="btn btn-danger">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
                                                 <button (click)="onActive(artItem.id_article)" class="button" data-bs-toggle="modal" data-bs-target="#myModal" type="button" class="btn btn-primary">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
                                                 <button (click)="deleteArticle(artItem.id_article)" type="button" class="btn btn-danger">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
+                                                
                                             </td>
 
                                         </tr>

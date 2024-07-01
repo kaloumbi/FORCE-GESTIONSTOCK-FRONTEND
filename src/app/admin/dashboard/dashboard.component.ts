@@ -6,7 +6,7 @@ import { CalendarModule } from 'primeng/calendar';
 
 import { DialogModule } from 'primeng/dialog';
 import { Router } from '@angular/router';
-import { Observable, Subject, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
+import { Observable, Subject, catchError, debounceTime, distinctUntilChanged, of, switchMap, tap, throwError } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserI } from '../../model/user-i';
 import { UserService } from '../../service/user.service';
@@ -55,6 +55,9 @@ export class DashboardComponent implements OnInit{
   //CONTEXT POPUP AJOUT MODIF
   selectedArticleId?: number;
 
+  //VARIABLE TO MODIFY
+  artiModif:ArticleI | undefined;
+
 
   constructor(private userService: UserService, private fb:FormBuilder, private tokserv: TokenService, private articleservice:ArticleService, private router:Router) { }
 
@@ -66,10 +69,11 @@ export class DashboardComponent implements OnInit{
 
     //Add article
     this.articleForm = this.fb.group({
+      id_article: [''],
       nom: ['', Validators.required],
       prix: ['', /*Validators.required*/],
       qte_dispo: ['', /*Validators.required*/],
-      id_USER: ['', /*Validators.required*/]
+      id_USER: ['', /*Validators.required*/],
     })
 
     this.search();
@@ -138,6 +142,8 @@ export class DashboardComponent implements OnInit{
       this.titleButton = 'Modifier';
       this.titleHeader = "Modification d'un produit";
       this.selectedArticleId = id;
+
+      this.upArticle(id);
       return id;
       // traitement modification produit
     } else {
@@ -225,8 +231,57 @@ export class DashboardComponent implements OnInit{
 
   }
 
+
+  detailArticle(articleId: number) :void {
+    alert(articleId);
+
+    //this.router.navigateByUrl("admin/article/detail");
+    this.router.navigate(["admin/article/"+articleId+"/detail"])
+  }
+
   reloadMyPage(){
     window.location.reload()
+  }
+
+  //Modif Article
+  upArticle(articleId: number) {
+    this.articleservice.getArticleByID(articleId).pipe(
+      tap((article: ArticleI) => {
+        this.artiModif = article;
+        if (article) {
+          this.articleForm.patchValue({
+            id_article: article.id_article,
+            nom: article.nom,
+            prix: article.prix,
+            qte_dispo: article.qte_dispo
+
+          });
+        }
+      }),
+      catchError(error => {
+        console.error('Error fetching article:', error);
+        return throwError(error); // Ou gérer l'erreur d'une autre manière
+      })
+    ).subscribe();
+    
+  }
+  
+
+  //On Edit
+  editArticle() {
+    
+    let formValue = this.articleForm.value;
+    console.log(formValue);
+    if (formValue.id_article) {
+      
+      this.articleservice.updateArticle(formValue.id_article, formValue).subscribe((data) => {
+        console.log("Article mise à jour avec succès !!", data);
+        
+      });
+    }
+
+    this.reloadMyPage();
+    
   }
     
 }
